@@ -1,6 +1,6 @@
 import "./style.css";
 import { lineChartData, lineChartMetaData } from "./data";
-import { chartData, metaData, IChartOptions, IPointsStructure } from "./chart/types";
+import { chartData, metaData, IChartOptions, IPointsStructure, IMinMaxRes } from "./chart/types";
 import { MathHelper } from "./chart/math.helpers";
 
 const DEFAULT_SPACE = 50;
@@ -14,13 +14,13 @@ class DrawLineChart extends MathHelper {
     space: DEFAULT_SPACE,
     width: 0,
     xDrawingArea: 0,
-    yDrawingArea: 0
+    yDrawingArea: 0,
   };
 
   constructor(
     context: CanvasRenderingContext2D,
     chartData: typeof lineChartData,
-    metaData: typeof lineChartMetaData, 
+    metaData: typeof lineChartMetaData,
     options: Partial<IChartOptions>
   ) {
     super();
@@ -33,15 +33,89 @@ class DrawLineChart extends MathHelper {
       width: 0,
       xDrawingArea: 0,
       yDrawingArea: 0,
-      ...options
-  }
-    
+      ...options,
+    };
   }
 
   setChartSizes(options: IChartOptions) {
     this.chartOptions = {
       ...this.chartOptions,
       ...options,
+    };
+  }
+
+  #fillTextForAxis(minMax: IMinMaxRes) {
+    let xAxisLen = this.chartOptions.space;
+    let xIndex = 0;
+
+    this.context.textAlign = "center";
+    this.context.strokeStyle = "black";
+
+    let xUnitInGivenValue = 1;
+    if (typeof minMax.x.max === "number") {
+      let perUnit = minMax.x.max / this.lengthOfXUnits;
+      xUnitInGivenValue = perUnit;
+    }
+
+    while (xIndex < this.lengthOfXUnits) {
+      this.context.beginPath();
+      this.context.moveTo(
+        xAxisLen,
+        this.chartOptions.height - this.chartOptions.space
+      );
+      this.context.lineTo(
+        xAxisLen,
+        this.chartOptions.height - this.chartOptions.space + 15
+      );
+
+      const text =
+        typeof this.xCoordinates[xIndex] === "string"
+          ? this.xCoordinates[xIndex]
+          : String(((xIndex + 1) * xUnitInGivenValue).toFixed(0));
+      this.context.fillText(
+        text,
+        xAxisLen,
+        this.chartOptions.height - this.chartOptions.space + 30
+      );
+      this.context.stroke();
+      this.context.closePath();
+      xAxisLen += this.xUnits;
+      xIndex += 1;
+    }
+
+    let yAxisLen = this.chartOptions.height - this.chartOptions.space;
+    let yIndex = this.lengthOfYUnits - 1;
+
+    let yUnitInGivenValue = 1;
+    if(typeof minMax.y.max === 'number') {
+      let perUnit = (minMax.y.max)/this.lengthOfYUnits 
+      yUnitInGivenValue = perUnit;
+    }
+    while (yIndex > -2) {
+      this.context.beginPath();
+      this.context.moveTo(
+        this.chartOptions.space,
+        this.chartOptions.height - yAxisLen
+      );
+      this.context.lineTo(
+        this.chartOptions.space - 15,
+        this.chartOptions.height - yAxisLen
+      );
+      const text =
+        typeof this.yCoordinates[yIndex] === "string"
+          ? this.yCoordinates[yIndex]
+          : String(((yIndex + 1) * yUnitInGivenValue).toFixed(0));
+
+      this.context.fillText(
+        text,
+        this.chartOptions.space - 30,
+        this.chartOptions.height - yAxisLen
+      );
+      this.context.stroke();
+      this.context.closePath();
+
+      yAxisLen -= this.yUnits;
+      yIndex -= 1;
     }
   }
 
@@ -50,69 +124,41 @@ class DrawLineChart extends MathHelper {
     this.context.moveTo(space, space);
     this.context.lineTo(space, height - space);
     this.context.lineTo(width - space, height - space);
-    this.context.strokeStyle = "white";
+    this.context.strokeStyle = "black";
     this.context.stroke();
     this.context.closePath();
 
     const minMax = this.findMinMax(this.chartData);
     for (let lineData of this.chartData) {
-      // const { xPoints, yPoints, points } = this.prepareCoordinatesForLine(
-      //   lineData.data
-      // );
-
-      // const po = this.findUnits(
-      //   xPoints,
-      //   yPoints,
-      //   xDrawingArea,
-      //   yDrawingArea
-      // );
-
-      // const findPointInPixel = (coor, minMax, index, unit, area) => {
-      //   if(typeof coor === 'string') {
-      //     const stringNo = index;
-      //     return (stringNo * unit) + space;
-      //   }
-
-      //   const calibratedXForGraph = coor - minMax.min;
-      //   const reqPercentage = Math.round((calibratedXForGraph / minMax.max) * 100);
-      //        const pixelForPoint = (area / 100) * reqPercentage;
-      //   return Number(pixelForPoint.toFixed(2)) + space;
-      // }
-      const points = this.convertPointsToPx(lineData.data, this.chartOptions, minMax)
+      const points = this.convertPointsToPx(
+        lineData.data,
+        this.chartOptions,
+        minMax
+      );
 
       points.forEach(({ xCoordinate, yCoordinate }, index) => {
-        // const xInPixelForPoint = findPointInPixel(point[0], x, index, po.xUnit, xDrawingArea);
-        // // y coordinate in canvas comes from top to bottom, in graph it is inverse
-        // const yInPixelForPoint = height - findPointInPixel(point[1], y, index, po.yUnit, yDrawingArea);
-
         this.context.beginPath();
-        // this.context.arc(
-        //   xCoordinate,
-        //   yCoordinate,
-        //   10,
-        //   Math.PI,
-        //   3 * Math.PI
-        // );
+        this.context.arc(xCoordinate, yCoordinate, 3, Math.PI, 3 * Math.PI);
 
-        const { x, y } = lineData.data[index]
+        // const { x, y } = lineData.data[index]
         // this.context.fillText(`${x}-${y}`, xCoordinate + 12, yCoordinate + 5);
         this.context.stroke();
         this.context.closePath();
       });
-        this.#drawLine(points, lineData.color)
+      this.#drawLine(points, lineData.color);
     }
+    this.#fillTextForAxis(minMax);
   }
 
-  #drawLine(points: IPointsStructure[], color: string) {
+  #drawLine(points: IPointsStructure[], color: string = 'black') {
     this.context.beginPath();
     let shouldMove = false;
-    for (let { xCoordinate,yCoordinate } of points) {
-
-      if(!shouldMove) {
-        this.context.moveTo(xCoordinate,yCoordinate);
-        shouldMove = true
+    for (let { xCoordinate, yCoordinate } of points) {
+      if (!shouldMove) {
+        this.context.moveTo(xCoordinate, yCoordinate);
+        shouldMove = true;
       } else {
-        this.context.lineTo(xCoordinate,yCoordinate)
+        this.context.lineTo(xCoordinate, yCoordinate);
       }
     }
 
@@ -124,7 +170,7 @@ class DrawLineChart extends MathHelper {
 
   initChart() {
     if (!this.context) {
-      throw new Error('Canvas context is not provided')
+      throw new Error("Canvas context is not provided");
     }
     const space = this?.chartOptions?.space || DEFAULT_SPACE;
 
@@ -135,7 +181,7 @@ class DrawLineChart extends MathHelper {
       yDrawingArea: this.context.canvas.height - 2 * space,
       xDrawingArea: this.context.canvas.width - 2 * space,
     };
-    this.setChartSizes(options)
+    this.setChartSizes(options);
     this.#drawChartRegion(this.chartOptions);
   }
 }

@@ -4,6 +4,10 @@ import { TLineData, chartData, coordinates, TFindPointInPixelArgs, IChartOptions
 export class MathHelper {
   xCoordinates: coordinates = [];
   yCoordinates: coordinates = [];
+  xUnits: number = 1;
+  yUnits: number = 1;
+  lengthOfXUnits: number = 1;
+  lengthOfYUnits: number = 1;
 
   constructor() {
     this.xCoordinates = [];
@@ -19,7 +23,7 @@ export class MathHelper {
   }
 
   #toFixedNum(num: number) {
-    return Number(num.toFixed(2))
+    return Number(num.toFixed(2));
   }
 
   #findPointInPixel = ({
@@ -43,17 +47,24 @@ export class MathHelper {
   };
 
   findMinMax(chartData: chartData): IMinMaxRes {
-    const xCoordinates = [];
-    const yCoordinates = [];
+    const xCoordinates = this.xCoordinates;
+    const yCoordinates = this.yCoordinates;
 
     for (let lineData of chartData) {
       for (let line of lineData.data) {
-        xCoordinates.push(line.x);
-        yCoordinates.push(line.y);
+        if(!xCoordinates.includes(line.x)) {
+           xCoordinates.push(line.x);   
+        }
+
+        if(!yCoordinates.includes(line.y)) {
+          yCoordinates.push(line.y);
+        }
       }
     }
     this.#sortCoordinates(xCoordinates);
     this.#sortCoordinates(yCoordinates);
+
+
     return {
       x: { min: xCoordinates[0], max: xCoordinates[xCoordinates.length - 1] },
       y: { min: yCoordinates[0], max: yCoordinates[yCoordinates.length - 1] },
@@ -72,10 +83,19 @@ export class MathHelper {
     }
   }
 
-  findUnits(xPoints, yPoints, width: number, height: number) {
+  findUnits(
+    xPoints: number[] | string[],
+    yPoints: number[] | string[],
+    width: number,
+    height: number
+  ) {
     const xUnit = this.#findUnit(xPoints, width);
     const yUnit = this.#findUnit(yPoints, height);
 
+    this.xUnits = xUnit;
+    this.yUnits = yUnit;
+    this.lengthOfXUnits = xPoints.length;
+    this.lengthOfYUnits = yPoints.length;
     return { xUnit, yUnit };
   }
 
