@@ -5,7 +5,7 @@ import { MathHelper } from "./chart/math.helpers";
 
 const DEFAULT_SPACE = 50;
 
-class DrawLineChart extends MathHelper {
+export class DrawLineChart extends MathHelper {
   chartData: chartData = lineChartData;
   metaData: metaData = lineChartMetaData;
   context: CanvasRenderingContext2D;
@@ -185,21 +185,21 @@ class DrawLineChart extends MathHelper {
     this.#drawChartRegion(this.chartOptions);
   }
 }
-// create canvas and attach element
-const canvas = document.createElement("canvas");
+// // create canvas and attach element
+// const canvas = document.createElement("canvas");
 
-const lineChart = document.querySelector("#line-chart");
-canvas.id = "line-chart-graph";
+// const lineChart = document.querySelector("#line-chart");
+// canvas.id = "line-chart-graph";
 
-canvas.setAttribute("width", "666px");
-canvas.setAttribute("height", "500px");
-const context = canvas.getContext("2d");
+// canvas.setAttribute("width", "666px");
+// canvas.setAttribute("height", "500px");
+// const context = canvas.getContext("2d");
 
-if (context) {
-  const chart1 = new DrawLineChart(context, lineChartData, lineChartMetaData, {});
-  chart1.initChart();
-}
+// if (context) {
+//   const chart1 = new DrawLineChart(context, lineChartData, lineChartMetaData, {});
+//   chart1.initChart();
+// }
 
-if (lineChart) {
-  lineChart.appendChild(canvas);
-}
+// if (lineChart) {
+//   lineChart.appendChild(canvas);
+// }
