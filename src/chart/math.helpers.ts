@@ -61,8 +61,10 @@ export class MathHelper {
         }
       }
     }
+
     this.#sortCoordinates(xCoordinates);
     this.#sortCoordinates(yCoordinates);
+    console.log("yCoordinates", yCoordinates, xCoordinates);
 
 
     return {

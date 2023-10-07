@@ -1,4 +1,4 @@
-import { lineChartData, lineChartMetaData } from "../data";
+import { lineChartData, lineChartMetaData } from "../stories/data";
 
 
 export type chartData = typeof lineChartData;

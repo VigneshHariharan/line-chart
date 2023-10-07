@@ -5,7 +5,7 @@ export const lineChartData = [
     data: [
       {
         x: "plane",
-        y: 270,
+        y: 234,
       },
       {
         x: "helicopter",

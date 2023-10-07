@@ -1,17 +1,26 @@
 import React, { useEffect, useRef } from 'react';
 import { DrawLineChart } from '../lineChart'
-import { lineChartData, lineChartMetaData } from '../data';
+import {
+  chartData,
+  metaData,
+} from "../chart/types";
 
-interface ILineChart {
+export interface ILineChart {
   /** unique id for the element */
   id: string;
   /** width of canvas in pixels */
   width?: number;
   /** height of canvas in pixels */
   height?: number;
+  /** height of canvas in pixels */
+  space?: number;
+  /** chart data with data -> { x,y format } */
+  chartData: chartData;
+  /** chart for labels */
+  metaData: metaData;
 }
 
-const LineChart = ({ id, height, width }: ILineChart) => {
+const LineChart = ({ id, height, width, space, chartData, metaData }: ILineChart) => {
     const canvasRef = useRef(null);
 
     useEffect(() => {
@@ -22,7 +31,16 @@ const LineChart = ({ id, height, width }: ILineChart) => {
         const context = canvasElement.getContext('2d')
 
         if(context) {
-           const lineChart = new DrawLineChart(context, lineChartData, lineChartMetaData, {});
+           const lineChart = new DrawLineChart(
+             context,
+             chartData,
+             metaData,
+             {
+              height,
+              width,
+              space,
+             }
+           );
            lineChart.initChart()
         }
     }, [canvasRef, width, height]);

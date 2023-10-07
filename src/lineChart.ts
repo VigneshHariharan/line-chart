@@ -1,5 +1,5 @@
 import "./style.css";
-import { lineChartData, lineChartMetaData } from "./data";
+import { lineChartData, lineChartMetaData } from "./stories/data";
 import { chartData, metaData, IChartOptions, IPointsStructure, IMinMaxRes } from "./chart/types";
 import { MathHelper } from "./chart/math.helpers";
 
@@ -136,12 +136,9 @@ export class DrawLineChart extends MathHelper {
         minMax
       );
 
-      points.forEach(({ xCoordinate, yCoordinate }, index) => {
+      points.forEach(({ xCoordinate, yCoordinate }) => {
         this.context.beginPath();
         this.context.arc(xCoordinate, yCoordinate, 3, Math.PI, 3 * Math.PI);
-
-        // const { x, y } = lineData.data[index]
-        // this.context.fillText(`${x}-${y}`, xCoordinate + 12, yCoordinate + 5);
         this.context.stroke();
         this.context.closePath();
       });
@@ -185,21 +182,3 @@ export class DrawLineChart extends MathHelper {
     this.#drawChartRegion(this.chartOptions);
   }
 }
-// // create canvas and attach element
-// const canvas = document.createElement("canvas");
-
-// const lineChart = document.querySelector("#line-chart");
-// canvas.id = "line-chart-graph";
-
-// canvas.setAttribute("width", "666px");
-// canvas.setAttribute("height", "500px");
-// const context = canvas.getContext("2d");
-
-// if (context) {
-//   const chart1 = new DrawLineChart(context, lineChartData, lineChartMetaData, {});
-//   chart1.initChart();
-// }
-
-// if (lineChart) {
-//   lineChart.appendChild(canvas);
-// }

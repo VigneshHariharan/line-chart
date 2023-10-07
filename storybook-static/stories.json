@@ -1,1 +1,0 @@
-{"v":3,"stories":{"linechart--default":{"id":"linechart--default","name":"Default","title":"LineChart","importPath":"./src/stories/Chart.stories.tsx","tags":["story"],"kind":"LineChart","story":"Default","parameters":{"__id":"linechart--default","docsOnly":false,"fileName":"./src/stories/Chart.stories.tsx"}}}}
